@@ -1,0 +1,26 @@
+import hashlib
+import base64
+from sqlalchemy import Column, Integer, String, TIMESTAMP, func
+from database import Base
+
+
+class UserModel(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    username = Column(String(100), unique=True, nullable=False)
+    email = Column(String(150), unique=True, nullable=False)
+    password = Column(String(255), nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.now())
+
+    # ✅ Method to hash password before saving (alphanumeric only)
+    def set_password(self, plain_password: str):
+        hash_bytes = hashlib.sha256(plain_password.encode()).digest()
+        b64_encoded = base64.b64encode(hash_bytes).decode('utf-8')
+        self.password = ''.join(filter(str.isalnum, b64_encoded))
+
+    # ✅ Method to verify password
+    def verify_password(self, plain_password: str) -> bool:
+        hash_bytes = hashlib.sha256(plain_password.encode()).digest()
+        b64_encoded = base64.b64encode(hash_bytes).decode('utf-8')
+        return self.password == ''.join(filter(str.isalnum, b64_encoded))
