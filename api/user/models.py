@@ -1,6 +1,7 @@
+from sqlalchemy import Column, Integer, String, TIMESTAMP, func, ForeignKey
+from sqlalchemy.orm import relationship
 import hashlib
 import base64
-from sqlalchemy import Column, Integer, String, TIMESTAMP, func
 from database import Base
 
 
@@ -12,6 +13,9 @@ class UserModel(Base):
     email = Column(String(150), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
+    role_id = Column(Integer, ForeignKey("user_roles.id"), nullable=False)
+
+    role = relationship("UserRolesModel", back_populates="users")
 
     # ✅ Method to hash password before saving (alphanumeric only)
     def set_password(self, plain_password: str):
@@ -24,3 +28,14 @@ class UserModel(Base):
         hash_bytes = hashlib.sha256(plain_password.encode()).digest()
         b64_encoded = base64.b64encode(hash_bytes).decode('utf-8')
         return self.password == ''.join(filter(str.isalnum, b64_encoded))
+
+
+class UserRolesModel(Base):
+    __tablename__ = "user_roles"
+
+    roles_list = ["ADMIN", "USER"]
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String(50), nullable=False, unique=True)
+
+    users = relationship("UserModel", back_populates="role")
