@@ -15,3 +15,13 @@ user_app/
     |- main.py      -> fastapi application instance
     |- readme.txt   -> contain project structure
     |- requirements.txt     -> application requirement
+    |- background_task/ this directory all related to celery
+        |- celery.py
+        |- beat_schedule.py
+        |- example_tasks.py
+        |- __init__.py
+
+
+celery command to run in terminal
+worker=>  celery -A background_task.celery_app.celery_app worker --loglevel=info --pool=solo
+beat=> celery -A background_task.celery_app.celery_app beat --loglevel=info
