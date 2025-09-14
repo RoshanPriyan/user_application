@@ -25,3 +25,6 @@ user_app/
 celery command to run in terminal
 worker=>  celery -A background_task.celery_app.celery_app worker --loglevel=info --pool=solo
 beat=> celery -A background_task.celery_app.celery_app beat --loglevel=info
+
+db migration command
+PS C:\Program Files\MySQL\MySQL Server 8.0\bin> .\mysqldump.exe -u root -p user_app > "$HOME\backup.sql"

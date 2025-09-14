@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, TIMESTAMP, func, ForeignKey
+from sqlalchemy import Column, Integer, String, TIMESTAMP, func, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 import hashlib
 import base64
@@ -14,8 +14,10 @@ class UserModel(Base):
     password = Column(String(255), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
     role_id = Column(Integer, ForeignKey("user_roles.id"), nullable=False)
+    auth_id = Column(Integer, ForeignKey("user_auth.id"), nullable=False)
 
     role = relationship("UserRolesModel", back_populates="users")
+    auth = relationship("UserAuthModel", back_populates="auth_users")
 
     # ✅ Method to hash password before saving (alphanumeric only)
     def set_password(self, plain_password: str):
@@ -39,3 +41,14 @@ class UserRolesModel(Base):
     name = Column(String(50), nullable=False, unique=True)
 
     users = relationship("UserModel", back_populates="role")
+
+
+class UserAuthModel(Base):
+    __tablename__ = "user_auth"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    access_token = Column(String(255), nullable=False)
+    created_date = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_date = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    auth_users = relationship("UserModel", back_populates="auth")
