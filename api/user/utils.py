@@ -1,8 +1,7 @@
 from sqlalchemy import select
-import secrets
 import hashlib
 from datetime import datetime
-from api.user.models import UserRolesModel
+from api.user.models import UserRolesModel, UserAuthModel, UserModel
 
 
 async def get_role_id(role: str, session):
@@ -21,3 +20,13 @@ def generate_token(username: str) -> str:
     data = f"{username}-{datetime.now().isoformat()}"
     token = hashlib.sha256(data.encode()).hexdigest()
     return token
+
+
+def get_token_user_role(token: str, session):
+    get_token_user_stmt = (
+        select(UserModel).select_from(UserModel)
+        .join(UserModel.auth)
+        .where(UserAuthModel.access_token == token)
+    )
+    get_token_user = session.execute(get_token_user_stmt).scalars().first()
+    return get_token_user

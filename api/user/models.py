@@ -13,6 +13,7 @@ class UserModel(Base):
     email = Column(String(150), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
+    is_active = Column(Integer, nullable=False, server_default="0")
     role_id = Column(Integer, ForeignKey("user_roles.id"), nullable=False)
     auth_id = Column(Integer, ForeignKey("user_auth.id"), nullable=False)
 
