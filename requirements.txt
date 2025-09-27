@@ -9,3 +9,4 @@ python-multipart
 celery
 redis
 flower
+python-dotenv
