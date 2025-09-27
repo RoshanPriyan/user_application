@@ -29,3 +29,9 @@ class UserRoleSchema(BaseModel):
 class UserLoginSchema(BaseModel):
     username: str
     password: str
+
+
+class ForgotPasswordSchema(BaseModel):
+    email: str
+    password: str
+    confirm_password: str

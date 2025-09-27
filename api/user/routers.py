@@ -4,6 +4,7 @@ from api.user.views.add_roles_api import create_role_api
 from api.user.views.login_api import user_login_api
 from api.user.views.list_user_roles_api import list_role_api
 from api.user.views.user_list_api import user_list_api
+from api.user.views.forgot_password_api import forgot_password_api
 
 
 router = APIRouter(prefix="/api/v1/user", tags=["Users"])
@@ -13,3 +14,4 @@ router.add_api_route("/role", create_role_api, methods=["POST"])
 router.add_api_route("/login", user_login_api, methods=["POST"])
 router.add_api_route("/role-list", list_role_api, methods=["GET"])
 router.add_api_route("/user-list", user_list_api, methods=["GET"])
+router.add_api_route("/forgot-password", forgot_password_api, methods=["POST"])
