@@ -14,7 +14,7 @@ class UserModel(Base):
     password = Column(String(255), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
     is_active = Column(Integer, nullable=False, server_default="0")
-    role_id = Column(Integer, ForeignKey("user_roles.id"), nullable=False)
+    role_id = Column(Integer, ForeignKey("user_roles.id"), nullable=False, server_default="2")
     auth_id = Column(Integer, ForeignKey("user_auth.id"), nullable=False)
 
     role = relationship("UserRolesModel", back_populates="users")
@@ -40,6 +40,7 @@ class UserRolesModel(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(50), nullable=False, unique=True)
+    created_at = Column(TIMESTAMP, server_default=func.now())
 
     users = relationship("UserModel", back_populates="role")
 

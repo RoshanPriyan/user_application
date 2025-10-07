@@ -19,11 +19,11 @@ origins = [
 # middleware handled
 app.add_middleware(ExceptionHandlerMiddleware)
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+   CORSMiddleware,
+   allow_origins=["http://localhost:5173", "http://localhost:3000"],  # dev frontends
+   allow_credentials=True,
+   allow_methods=["*"],
+   allow_headers=["*"],
 )
 
 test_connection()

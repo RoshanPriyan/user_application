@@ -6,8 +6,9 @@ import traceback
 from database import get_db
 from api.user.schemas import UserSchema
 from api.user.models import UserModel, UserAuthModel
-from api.user.utils import get_role_id, generate_token, get_user_role
+from api.user.utils import generate_token, get_user_role
 from global_utils import success_response, CustomException
+from background_task.example_tasks import send_verification_email
 
 
 async def user_register_api(
@@ -16,7 +17,6 @@ async def user_register_api(
 ):
     try:
         user_name = data.username
-        role_id = await get_role_id(data.role, session)
 
         existing_user_stmt = select(UserModel).where(UserModel.username == user_name)
         existing_user_exe = session.execute(existing_user_stmt)
@@ -39,7 +39,7 @@ async def user_register_api(
         session.add(user_auth)
         session.flush()
 
-        user = UserModel(username=data.username, email=data.email, role_id=role_id, auth_id=user_auth.id)
+        user = UserModel(username=data.username, email=data.email, auth_id=user_auth.id)
         user.set_password(data.password)
         session.add(user)
         session.commit()
@@ -50,6 +50,7 @@ async def user_register_api(
             "role": role,
             "token": user_auth.access_token
         }
+        # send_verification_email.delay(data.email, token)
 
         return success_response(
             status_code=status.HTTP_200_OK,

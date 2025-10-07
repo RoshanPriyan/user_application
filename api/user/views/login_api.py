@@ -6,7 +6,7 @@ import traceback
 from database import get_db
 from api.user.schemas import UserLoginSchema
 from api.user.models import UserModel, UserAuthModel
-from api.user.utils import get_user_role, generate_token
+from api.user.utils import get_user_role, generate_token, check_user_active
 from global_utils import success_response, CustomException
 
 
@@ -25,6 +25,7 @@ async def user_login_api(
                 detail="Invalid username or password"
             )
 
+        await check_user_active(data.username, session)
         role = await get_user_role(user.role_id, session)
         token = generate_token(user.username)
 
@@ -61,4 +62,3 @@ async def user_login_api(
             error=str(e),
             trace_back=traceback.format_exc()
         )
-

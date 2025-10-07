@@ -1,7 +1,9 @@
+from fastapi import status
 from sqlalchemy import select
 import hashlib
 from datetime import datetime
 from api.user.models import UserRolesModel, UserAuthModel, UserModel
+from global_utils import CustomException
 
 
 async def get_role_id(role: str, session):
@@ -30,3 +32,14 @@ def get_token_user_role(token: str, session):
     )
     get_token_user = session.execute(get_token_user_stmt).scalars().first()
     return get_token_user
+
+
+async def check_user_active(username: str, session):
+    check_user_active_stmt = select(UserModel).where(UserModel.username == username, UserModel.is_active == 1)
+    check_user_active_exe = session.execute(check_user_active_stmt)
+    active_user = check_user_active_exe.scalar_one_or_none()
+    if not active_user:
+        raise CustomException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is inactive"
+        )
