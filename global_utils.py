@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from database import engine
 from database import get_db
-from api.user.models import UserAuthModel
+from api.user.models import UserAuthModel, UserRolesModel, UserModel
 
 
 # ✅ Debug: test DB connection (without queries)
@@ -52,3 +52,33 @@ def verify_token(
             detail="Invalid Token in header"
         )
     return validate_token
+
+
+def admin_access(request: Request, session: Session = Depends(get_db)):
+    token = request.headers.get("token")
+
+    if not token:
+        raise CustomException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing Token is header"
+        )
+
+    validate_token_stmt = (
+        select(UserRolesModel.name)
+        .select_from(UserRolesModel)
+        .outerjoin(UserModel)
+        .outerjoin(UserAuthModel)
+        .where(UserAuthModel.access_token == token)
+    )
+    validate_token = session.execute(validate_token_stmt).scalars().one_or_none()
+
+    if not validate_token:
+        raise CustomException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Token in header"
+        )
+    if validate_token != "ADMIN":
+        raise CustomException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized user"
+        )

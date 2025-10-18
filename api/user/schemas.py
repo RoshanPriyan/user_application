@@ -1,6 +1,4 @@
-from fastapi import status
-from global_utils import CustomException
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel
 
 
 class UserSchema(BaseModel):
