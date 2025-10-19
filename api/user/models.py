@@ -19,6 +19,7 @@ class UserModel(Base):
 
     role = relationship("UserRolesModel", back_populates="users")
     auth = relationship("UserAuthModel", back_populates="auth_users")
+    profile = relationship("UserProfileModel", back_populates="user")
 
     # ✅ Method to hash password before saving (alphanumeric only)
     def set_password(self, plain_password: str):
@@ -54,3 +55,25 @@ class UserAuthModel(Base):
     updated_date = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     auth_users = relationship("UserModel", back_populates="auth")
+
+
+class UserProfileModel(Base):
+    __tablename__ = "user_profile"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    first_name = Column(String(50), nullable=True)
+    last_name = Column(String(50), nullable=True)
+    phone_number = Column(String(20), nullable=True)
+    address_line1 = Column(String(255), nullable=True)
+    address_line2 = Column(String(255), nullable=True)
+    city = Column(String(50), nullable=True)
+    state = Column(String(50), nullable=True)
+    postal_code = Column(String(20), nullable=True)
+    country = Column(String(50), nullable=True)
+    profile_picture = Column(String(255), nullable=True)
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+
+    # Relationship to UserModel
+    user = relationship("UserModel", back_populates="profile")

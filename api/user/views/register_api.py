@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import traceback
 from database import get_db
 from api.user.schemas import UserSchema
-from api.user.models import UserModel, UserAuthModel
+from api.user.models import UserModel, UserAuthModel, UserProfileModel
 from api.user.utils import generate_token, get_user_role
 from global_utils import success_response, CustomException
 from background_task.example_tasks import send_verification_email
@@ -42,8 +42,14 @@ async def user_register_api(
         user = UserModel(username=data.username, email=data.email, auth_id=user_auth.id)
         user.set_password(data.password)
         session.add(user)
+        session.flush()
+
+        user_profile = UserProfileModel(user_id=user.id)
+        session.add(user_profile)
         session.commit()
+
         role = await get_user_role(user.role_id, session)
+
         user_data = {
             "username": data.username,
             "email": data.email,
