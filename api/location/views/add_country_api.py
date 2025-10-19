@@ -12,11 +12,11 @@ from global_utils import success_response, CustomException, admin_access
 async def add_country_api(
         data: AddCountrySchema,
         session: Session = Depends(get_db),
-        token = Depends(admin_access)
+        token=Depends(admin_access)
 ):
     try:
-        name = data.name.upper()
-        code = data.code.upper()
+        name = data.name
+        code = data.code
 
         check_stmt = select(CountryModel).where(CountryModel.name == name)
         existing_country = session.execute(check_stmt).scalars().one_or_none()
@@ -27,8 +27,8 @@ async def add_country_api(
                 detail=f"Country '{existing_country.name}' already exist"
             )
 
-        add_role = CountryModel(name=name, code=code)
-        session.add(add_role)
+        country_data = CountryModel(name=name, code=code)
+        session.add(country_data)
         session.commit()
 
         return success_response(
@@ -44,4 +44,3 @@ async def add_country_api(
             error=str(e),
             trace_back=traceback.format_exc()
         )
-    

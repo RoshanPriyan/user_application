@@ -4,21 +4,23 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 import traceback
 from database import get_db
-from api.location.models import CountryModel
+from api.location.models import CityModel
 from global_utils import success_response, CustomException, verify_token
 
 
-async def country_list_api(
+async def city_list_api(
+        state_id: int,
         session: Session = Depends(get_db),
         token=Depends(verify_token)
 ):
     try:
-        country_stmt = select(CountryModel.id, CountryModel.name, CountryModel.code)
-        country_data = session.execute(country_stmt).mappings().all()
+        state_stmt = select(CityModel.id, CityModel.name).where(CityModel.state_id == state_id)
+        state_data = session.execute(state_stmt).mappings().all()
+
         return success_response(
             status_code=status.HTTP_200_OK,
-            details="Country added successfully",
-            data=country_data
+            details="city listed successfully",
+            data=state_data
         )
 
     except SQLAlchemyError as e:
